@@ -1,0 +1,160 @@
+{
+  "template": "test*",
+  "settings": {
+    "index": {
+      "number_of_shards": 3,
+      "number_of_replicas" : 0
+    },
+    "analysis": {
+      "filter": {
+        "autocomplete_filter": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20
+        }
+      },
+      "tokenizer": {
+        "whitespace": {
+          "type": "whitespace"
+        }
+      },
+      "normalizer": {
+        "lower_case": {
+          "type": "custom",
+          "char_filter": [],
+          "filter": ["lowercase", "asciifolding"]
+        }
+      },
+      "analyzer": {
+        "autocomplete": { 
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "autocomplete_filter"
+          ]
+        },
+        "fingerprint_en": {
+          "type": "fingerprint",
+          "stopwords": "_english_"
+        },
+        "urls-links-emails": {
+          "type": "custom",
+          "tokenizer": "uax_url_email"
+        },
+        "address": {
+          "type": "custom",
+          "tokenizer": "whitespace",
+          "filter": ["trim", "lowercase"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "_doc": {
+      "dynamic": false,
+      "dynamic_templates": [
+        {
+          "shapes": {
+            "match": "shape",
+            "mapping": {
+              "type": "geo_shape",
+              "tree": "quadtree",
+              "precision": "50m"
+            }
+          }
+        },
+        {
+          "points": {
+            "match": "point",
+            "mapping": {
+              "type": "geo_point"
+            }
+          }
+        },
+        {
+          "strings": {
+            "match_mapping_type": "string",
+            "mapping": {
+              "type": "text",
+              "fields": {
+                "raw": {
+                  "type": "keyword",
+                  "ignore_above": 255
+                }
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "id": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "keyword",
+          "normalizer": "lower_case"
+        },
+        "count": {
+          "type": "integer",
+          "coerce": true,
+          "null_value": 1
+        },
+        "published": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        },
+        "updated": {
+          "type": "date",
+          "format": "strict_date_optional_time||epoch_millis"
+        },
+        "status": {
+          "type": "keyword"
+        },
+        "request": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "ip_address": {
+              "type": "ip"
+            },
+            "user_agent": {
+              "type": "text",
+              "fields": {
+                "raw": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "referrer": {
+              "type": "text",
+              "analyzer": "urls-links-emails"
+            },
+            "location": {
+              "properties": {
+                "latitude": {
+                  "type": "float"
+                },
+                "longitude": {
+                  "type": "float"
+                },
+                "shape": {
+                  "type": "geo_shape",
+                  "tree": "quadtree",
+                  "precision": "50m"
+                },
+                "point": {
+                  "type": "geo_point"
+                }
+              }
+            },
+            "utc_offset": {
+              "type": "float"
+            }
+          }
+        }
+      }
+    }
+  }
+}

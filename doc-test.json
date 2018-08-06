@@ -1,0 +1,24 @@
+{
+	"id": "test123",
+	"type": "contact",
+	"status": "active",
+	"published": "2018-07-04T00:00:01Z",
+	"request": {
+		"id": "abc123test999",
+		"ip_address": "8.8.8.8",
+		"user_agent": "Mozilla 5000",
+		"location": {
+			"shape": {
+				"type": "point",
+				"coordinates": [-113.994, 46.872]
+			},
+			"point": {
+				"lat": 46.872,
+				"lon": -113.994
+			},
+			"latitude": 46.872,
+			"longitude": -113.994
+		},
+		"utc_offset": -7.0
+	}
+}
